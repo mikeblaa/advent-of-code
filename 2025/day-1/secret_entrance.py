@@ -4,9 +4,6 @@
 Usage:
   python read_file.py PATH
   python read_file.py -            # read from stdin
-
-Options:
-  -e, --encoding ENC   : decode using ENC when reading text (default: binary copy)
 """
 
 from __future__ import annotations
@@ -16,19 +13,6 @@ import sys
 from pathlib import Path
 from typing import Tuple
 
-class SecretEntrance():
-
-    @staticmethod
-    def generate_dial(size: int) -> CircularLinkedList:
-        cll = CircularLinkedList()
-        for i in range(size):
-            cll.append(i)
-        return cll
-    
-    @staticmethod
-    def parse_line(line: str) -> Tuple[str, int]:
-        return "R", 3
-
 class Dial:
     def __init__(self, size: int):
         self.size = size
@@ -36,6 +20,7 @@ class Dial:
         for i in range(size):
             self.cll.append(i)
         self.current_node = self.cll.head
+        self.zero_click_count = 0
     
     def current_number(self) -> int:
         return self.current_node.data
@@ -45,10 +30,19 @@ class Dial:
         return self.current_node.data
     
     def rotate_left(self, steps: int):
-        self.current_node = self.cll.left_seek(self.current_node, steps)
+        for _ in range(steps):
+            self.current_node = self.current_node.prev
+            if self.current_node.data == 0:
+                self.zero_click_count += 1
 
     def rotate_right(self, steps: int):
-        self.current_node = self.cll.right_seek(self.current_node, steps)
+        for _ in range(steps):
+            self.current_node = self.current_node.next
+            if self.current_node.data == 0:
+                self.zero_click_count += 1
+
+    def get_zero_click_count(self) -> int:
+        return self.zero_click_count
 
 class Node:
     def __init__(self, data):
@@ -94,34 +88,6 @@ class CircularLinkedList:
             if current == self.head:
                 return None
         return current
-    
-    def left_seek(self, node: Node, steps: int) -> Node:
-        # Seek a number of steps to the left (previous) from the given node
-        if not node:
-            return None
-        current = node
-        for _ in range(steps):
-            current = current.prev
-        return current
-    
-    def right_seek(self, node: Node, steps: int) -> Node:
-        # Seek a number of steps to the right (next) from the given node
-        if not node:
-            return None
-        current = node
-        for _ in range(steps):
-            current = current.next
-        return current
-    
-    def traverse(self):
-        # Traverse and display the elements of the circular linked list
-        if not self.head:
-            print("Circular Linked List is empty")
-            return
-        current = self.head
-        while True:
-            print(current.data, end=" -> ")
-            current = current.next
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -172,7 +138,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Unknown direction: {direction}", file=sys.stderr)
             return 5
 
-    print(counter)
+    print(dial.get_zero_click_count())
     return 0
 
 
