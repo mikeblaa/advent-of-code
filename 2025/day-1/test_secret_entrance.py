@@ -1,7 +1,36 @@
 #!/usr/bin/env python3
 
 import unittest
-from secret_entrance import SecretEntrance, Node, CircularLinkedList
+from secret_entrance import SecretEntrance, Node, CircularLinkedList, Dial
+
+class TestDial(unittest.TestCase):
+    def test_seek(self):
+        dial = Dial(10)
+        self.assertEqual(dial.seek(0), 0)
+        self.assertEqual(dial.seek(5), 5)
+        self.assertEqual(dial.seek(9), 9)
+
+    def test_current_number(self):
+        dial = Dial(10)
+        self.assertEqual(dial.current_number(), 0)
+        dial.seek(5)
+        self.assertEqual(dial.current_number(), 5)
+
+    def test_rotate_left(self):
+        dial = Dial(10)
+        dial.seek(5)
+        dial.rotate_left(3)
+        self.assertEqual(dial.current_number(), 2)
+        dial.rotate_left(5)
+        self.assertEqual(dial.current_number(), 7)
+
+    def test_rotate_right(self):
+        dial = Dial(10)
+        dial.seek(5)
+        dial.rotate_right(3)
+        self.assertEqual(dial.current_number(), 8)
+        dial.rotate_right(5)
+        self.assertEqual(dial.current_number(), 3)
 
 class TestSecretEntrance(unittest.TestCase):
     
@@ -27,8 +56,6 @@ class TestSecretEntrance(unittest.TestCase):
         self.assertEqual(cll.seek(0).data, 0)
         self.assertEqual(cll.seek(1).data, 1)
         self.assertEqual(cll.seek(4).data, 4)
-        self.assertEqual(cll.seek(5).data, 0)  # Wrap around
-        self.assertEqual(cll.seek(7).data, 2)  # Wrap around    
 
     def test_left_rotation(self):
         cll = CircularLinkedList()

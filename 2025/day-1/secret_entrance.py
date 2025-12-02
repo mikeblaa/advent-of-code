@@ -29,6 +29,27 @@ class SecretEntrance():
     def parse_line(line: str) -> Tuple[str, int]:
         return "R", 3
 
+class Dial:
+    def __init__(self, size: int):
+        self.size = size
+        self.cll = CircularLinkedList()
+        for i in range(size):
+            self.cll.append(i)
+        self.current_node = self.cll.head
+    
+    def current_number(self) -> int:
+        return self.current_node.data
+    
+    def seek(self, position: int) -> int:
+        self.current_node = self.cll.seek(position)
+        return self.current_node.data
+    
+    def rotate_left(self, steps: int):
+        self.current_node = self.cll.left_seek(self.current_node, steps)
+
+    def rotate_right(self, steps: int):
+        self.current_node = self.cll.right_seek(self.current_node, steps)
+
 class Node:
     def __init__(self, data):
         # Initialize a node with data and next pointer
@@ -58,14 +79,20 @@ class CircularLinkedList:
             # Make the new node point back to the head
             new_node.next = self.head
             new_node.prev = current
+            # Update head's prev to new node
+            self.head.prev = new_node
 
-    def seek(self, steps: int) -> Node:
-        # Seek a number of steps from the head and return the node at that position
+    def seek(self, number: int) -> Node:
+        # Find the first node whose data equals number. Return None if not found.
         if not self.head:
             return None
         current = self.head
-        for _ in range(steps):
+        while True:
+            if current.data == number:
+                return current
             current = current.next
+            if current == self.head:
+                return None
         return current
     
     def left_seek(self, node: Node, steps: int) -> Node:
@@ -97,44 +124,26 @@ class CircularLinkedList:
             current = current.next
 
 
-
 def main(argv: list[str] | None = None) -> int:
     argv = list(argv) if argv is not None else sys.argv[1:]
     parser = argparse.ArgumentParser(description="Read a file and write it to stdout")
     parser.add_argument("path", help="Path to file to read; use '-' for stdin")
-    parser.add_argument("-e", "--encoding", help="Decode bytes with this encoding (default: raw binary)")
     args = parser.parse_args(argv)
 
-    circular_list = CircularLinkedList()
-    circular_list.append(1)
-    circular_list.append(2)
-    circular_list.append(3)
-
-    print("Traversing Circular Linked List:")
-    circular_list.traverse()
-
+    rotations = []
     try:
         if args.path == "-":
             data = sys.stdin.buffer.read()
-            if args.encoding:
-                try:
-                    text = data.decode(args.encoding)
-                except Exception as exc:  # decoding error
-                    print(f"Decoding error: {exc}", file=sys.stderr)
-                    return 2
-                sys.stdout.write(text)
-            else:
-                sys.stdout.buffer.write(data)
+            sys.stdout.buffer.write(data)
             return 0
 
         p = Path(args.path)
-        if args.encoding:
-            with p.open("r", encoding=args.encoding) as f:
-                sys.stdout.write(f.read())
-        else:
-            with p.open("rb") as f:
-                sys.stdout.buffer.write(f.read())
-        return 0
+        with p.open("r") as f:
+            # Read one line at a time and parse it into an array of tuples
+            for line in f:
+                direction = line[:1]
+                steps = int(line[1:].strip())
+                rotations.append((direction, steps))
 
     except FileNotFoundError:
         print(f"File not found: {args.path}", file=sys.stderr)
@@ -145,6 +154,26 @@ def main(argv: list[str] | None = None) -> int:
     except Exception as exc:
         print(f"Error reading {args.path}: {exc}", file=sys.stderr)
         return 4
+    
+    dial = Dial(100)
+    dial.seek(50)
+    counter = 0
+
+    for direction, steps in rotations:
+        if direction == "L":
+            dial.rotate_left(steps)
+            if dial.current_number() == 0:
+                counter += 1
+        elif direction == "R":
+            dial.rotate_right(steps)
+            if dial.current_number() == 0:
+                counter += 1
+        else:
+            print(f"Unknown direction: {direction}", file=sys.stderr)
+            return 5
+
+    print(counter)
+    return 0
 
 
 
