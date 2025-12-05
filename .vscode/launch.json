@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": "${command:pickArgs}"
+            "args": "--input ${workspaceFolder}/2025/day-5/example.txt"
         }
     ]
 }
