@@ -45,22 +45,35 @@ def solve_part1(data: Any) -> Any:
     fresh_ranges = data[:x]
     check_ingredients = data[x+1:]
     fresh_set = set()
-    for r in fresh_ranges:
-        start, end = range_to_start_end(r)
-        add_range_to_set(fresh_set, start, end)
 
-    count_fresh = 0
     for ingredient in check_ingredients:
-        if int(ingredient) in fresh_set:
-            count_fresh += 1
+        # Sanity check: all ingredients should be integers
+        int(ingredient)
+
+        # Iterate through the fresh ranges, check if ingredient is in any range
+        for r in fresh_ranges:
+            start, end = range_to_start_end(r)
+            if int(ingredient) >= start and int(ingredient) <= end:
+                fresh_set.add(int(ingredient))
+                break
+
+    count_fresh = len(fresh_set)
 
     return count_fresh
 
 
 def solve_part2(data: Any) -> Any:
     """Solve part 2. Return result (int, str, etc.)."""
-    # TODO: implement
-    return None
+    
+    # Find the first empty line, lines before are ranges of fresh ingredients, 
+    # lines after are ingredients to check
+    x = data.index("")
+
+    fresh_ranges = data[:x]
+    check_ingredients = data[x+1:]
+    fresh_set = set()
+
+    return len(fresh_set)
 
 """Part 1 methods"""
 def add_range_to_set(s: set[int], start: int, end: int) -> None:
@@ -70,6 +83,10 @@ def add_range_to_set(s: set[int], start: int, end: int) -> None:
 def range_to_start_end(r: str) -> Tuple[int, int]:
     start_str, end_str = r.split("-")
     return int(start_str), int(end_str)
+
+def range_size(r: str) -> int:
+    start, end = range_to_start_end(r)
+    return end - start + 1
 
 def main(argv: List[str] | None = None) -> int:
     args = parse_args(argv)

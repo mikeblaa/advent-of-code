@@ -26,5 +26,14 @@ class CafeteriaTest(unittest.TestCase):
         self.assertEqual(start, 0)
         self.assertEqual(end, 0)
         
+    def test_range_size(self):
+        r = "5-10"
+        size = range_size(r)
+        self.assertEqual(size, 6)
+
+        r = "0-0"
+        size = range_size(r)
+        self.assertEqual(size, 1)
+    
 if __name__ == "__main__":
     unittest.main()
