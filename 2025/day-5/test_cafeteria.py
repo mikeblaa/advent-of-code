@@ -34,6 +34,15 @@ class CafeteriaTest(unittest.TestCase):
         r = "0-0"
         size = range_size(r)
         self.assertEqual(size, 1)
+
+    def test_merge_ranges(self):
+        ranges = ["5-10", "8-12", "15-20"]
+        merged = merge_ranges(ranges)
+        self.assertEqual(merged, ["5-12", "15-20"])
+
+        ranges = ["1-3", "4-6", "7-9"]
+        merged = merge_ranges(ranges)
+        self.assertEqual(merged, ["1-9"])
     
 if __name__ == "__main__":
     unittest.main()

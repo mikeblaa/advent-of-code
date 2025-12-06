@@ -71,9 +71,15 @@ def solve_part2(data: Any) -> Any:
 
     fresh_ranges = data[:x]
     check_ingredients = data[x+1:]
-    fresh_set = set()
+    
+    merged_ranges = merge_ranges(fresh_ranges)
 
-    return len(fresh_set)
+    fresh_ingredient_count = 0
+
+    for ingredient in merged_ranges:
+        fresh_ingredient_count += range_size(ingredient)
+
+    return fresh_ingredient_count
 
 """Part 1 methods"""
 def add_range_to_set(s: set[int], start: int, end: int) -> None:
@@ -100,6 +106,23 @@ def main(argv: List[str] | None = None) -> int:
     print(f"Part 2: {part2}")
     return 0
 
+def merge_ranges(ranges: List[str]) -> List[str]:
+    """Merge overlapping ranges."""
+    int_ranges = [range_to_start_end(r) for r in ranges]
+    int_ranges.sort()
+
+    merged = []
+    current_start, current_end = int_ranges[0]
+
+    for start, end in int_ranges[1:]:
+        if start <= current_end + 1:
+            current_end = max(current_end, end)
+        else:
+            merged.append(str(current_start) + "-" + str(current_end))
+            current_start, current_end = start, end
+
+    merged.append(str(current_start) + "-" + str(current_end))
+    return merged
 
 if __name__ == "__main__":
     raise SystemExit(main())
