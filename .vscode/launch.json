@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": "--input ${workspaceFolder}/2025/day-6/example.txt"
+            "args": "--input ${workspaceFolder}/2025/day-6/puzzle.txt"
+//            "args": ""
         }
     ]
 }

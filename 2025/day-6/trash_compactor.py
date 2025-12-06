@@ -34,9 +34,82 @@ def parse_input(raw: str) -> Any:
     lines = [line for line in raw.splitlines()]
     return lines
 
+
 def line_to_array(line: str) -> List[str]:
     """Convert a line of input into an array of strings."""
     return [str(x.strip()) for x in line.split()]
+
+
+def find_column_widths(data: List[List[str]]) -> List[int]:
+    column_count = len(data[0])
+    max_col_widths = [0 for _ in range(len(line_to_array(data[0])))]
+
+    for row in data:
+        row_data = line_to_array(row)
+        for col in range(len(row_data)):
+            value = row_data[col]
+            value_len = len(value)
+
+            if value_len > max_col_widths[col]:
+                max_col_widths[col] = value_len
+    
+    return max_col_widths
+
+
+def line_to_array_with_fixed_widths(line: str, column_width: int) -> List[str]:
+    values = []
+    current_index = 0
+
+    col_start = 0
+    col_end = col_start + column_width
+
+    while col_start < len(line):
+        value = line[col_start:col_end]
+        values.append(value)
+        col_start += column_width + 1 # assuming a space between columns
+        col_end += column_width + 1
+
+    return values
+
+
+def pad_with_zeros(value: str, width: int) -> str:
+    if value.startswith(" "):
+        return value.lstrip().rjust(width, "0")
+    elif value.endswith(" "):
+        return value.rstrip().ljust(width, "0")
+    else:
+        return value
+
+
+def do_cephalapod_math(operator: str, values: List[str]) -> int:
+    number_width = len(values[0])
+    grand_total = 0
+
+    padded_values = []
+    for v in values:
+        padded_values.append(pad_with_zeros(v, len(v)))
+
+    if operator == "+":
+        for num_col in range(number_width):
+            curr_value_str = ""
+            for v in values:
+                curr_value_str += v[num_col]
+            curr_value = int(curr_value_str)
+            grand_total += curr_value
+    elif operator == "*":
+        grand_total = 1
+        for num_col in range(number_width):
+            curr_value_str = ""
+            for v in values:
+                curr_value_str += v[num_col]
+            curr_value = int(curr_value_str)
+            grand_total *= curr_value
+    else:
+        print(f"Unknown operator: {operator}")
+        return 0
+    
+    return grand_total
+
 
 def solve_part1(data: Any) -> Any:
     """Solve part 1. Return result (int, str, etc.)."""
@@ -74,15 +147,36 @@ def solve_part1(data: Any) -> Any:
 
 def solve_part2(data: Any) -> Any:
     """Solve part 2. Return result (int, str, etc.)."""
-    return None
+
+    column_widths = find_column_widths(data)
+
+    for row in range(len(data)):
+        data[row] = line_to_array_with_fixed_widths(data[row], column_widths[0])
+
+    operators = data.pop(-1)
+
+    for col in range(len(operators)):
+        operators[col] = operators[col].strip()
+
+    grand_total = 0
+
+    for col in range(len(column_widths)):
+        values = []
+        for row in range(len(data)):
+            values.append(data[row][col])
+
+        col_value = do_cephalapod_math(operators[col], values)
+        grand_total += col_value
+
+    return grand_total
 
 def main(argv: List[str] | None = None) -> int:
     args = parse_args(argv)
     raw = read_input(args.input)
     data = parse_input(raw)
 
-    part1 = solve_part1(data)
-    part2 = solve_part2(data)
+    part1 = solve_part1(data.copy())
+    part2 = solve_part2(data.copy())
 
     print(f"Part 1: {part1}")
     print(f"Part 2: {part2}")
