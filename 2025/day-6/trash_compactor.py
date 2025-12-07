@@ -56,18 +56,25 @@ def find_column_widths(data: List[List[str]]) -> List[int]:
     return max_col_widths
 
 
-def line_to_array_with_fixed_widths(line: str, column_width: int) -> List[str]:
+def line_to_array_with_fixed_widths(line: str, column_widths: List) -> List[str]:
     values = []
     current_index = 0
 
+    col_idx = 0
     col_start = 0
-    col_end = col_start + column_width
+    col_end = col_start + column_widths[col_idx]
 
     while col_start < len(line):
         value = line[col_start:col_end]
         values.append(value)
-        col_start += column_width + 1 # assuming a space between columns
-        col_end += column_width + 1
+        
+        col_start += column_widths[col_idx] + 1# assuming a space between columns
+        col_idx += 1
+        if col_idx == len(column_widths):
+            break
+
+        col_end += column_widths[col_idx] + 1
+        
 
     return values
 
@@ -94,6 +101,10 @@ def do_cephalapod_math(operator: str, values: List[str]) -> int:
             curr_value_str = ""
             for v in values:
                 curr_value_str += v[num_col]
+            
+            if curr_value_str.isspace():
+                break
+
             curr_value = int(curr_value_str)
             grand_total += curr_value
     elif operator == "*":
@@ -102,6 +113,10 @@ def do_cephalapod_math(operator: str, values: List[str]) -> int:
             curr_value_str = ""
             for v in values:
                 curr_value_str += v[num_col]
+            
+            if curr_value_str.isspace():
+                break
+
             curr_value = int(curr_value_str)
             grand_total *= curr_value
     else:
@@ -151,7 +166,7 @@ def solve_part2(data: Any) -> Any:
     column_widths = find_column_widths(data)
 
     for row in range(len(data)):
-        data[row] = line_to_array_with_fixed_widths(data[row], column_widths[0])
+        data[row] = line_to_array_with_fixed_widths(data[row], column_widths)
 
     operators = data.pop(-1)
 

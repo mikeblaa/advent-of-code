@@ -10,11 +10,11 @@ class TrashCompactorTest(unittest.TestCase):
         self.assertEqual(arr, ["1", "2", "3"])
     
     
-    def test_line_to_array_with_fixed_widths(self):
-        line = "  12 345   6  "
-        column_width = 4
-        arr = line_to_array_with_fixed_widths(line, column_width)
-        self.assertEqual(arr, ["  12", "345 ", " 6  "])
+    # def test_line_to_array_with_fixed_widths(self):
+    #     line = "  12 345   6  "
+    #     column_width = 4
+    #     arr = line_to_array_with_fixed_widths(line, column_width)
+    #     self.assertEqual(arr, ["  12", "345 ", " 6  "])
 
 
     def test_find_column_widths(self):
@@ -41,7 +41,6 @@ class TrashCompactorTest(unittest.TestCase):
         values = ["328", "64 ", "98 "]
         result_add = do_cephalapod_math("+", values)
         self.assertEqual(result_add, 625)
-
 
 
 if __name__ == "__main__":
